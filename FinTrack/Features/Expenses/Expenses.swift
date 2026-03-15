@@ -8,8 +8,22 @@
 import SwiftUI
 
 struct Expenses: View {
-    @StateObject private var expensesViewModel = ExpensesViewModel()
+    @StateObject private var expensesViewModel: ExpensesViewModel
     @State var showAddExpense: Bool = false
+    
+//    MARK: Initializing the View as the @StateObject has dependencies in initialization and cannot directly reference those properties to initalize the @StateObject (that is view model)
+    init() {
+        let directoryUrl = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first!
+        
+        let fileUrl = directoryUrl.appending(component: "expenses.json")
+        
+        let store = LocalExpensesStore(fileURL: fileUrl)
+        
+//        MARK: Usually swiftUI automatically creates the wrapper for @StateObject automatically behind the scenes, but when there are dependencies like this we need to manually create the wrapper and put the state object with depencdencies injected inside it and then assign it to _expenseViewModel, which generally gets automatically created if no dependencies.
+        _expensesViewModel = StateObject(
+            wrappedValue: ExpensesViewModel(store: store)
+        )
+    }
     
     var body: some View {
         content

@@ -36,5 +36,5 @@ struct AddExpenseView: View {
 }
 
 #Preview {
-    AddExpenseView(expensesViewModel: ExpensesViewModel(), expenseTitle: "", expenseAmount: "")
+//    AddExpenseView(expensesViewModel: ExpensesViewModel(), expenseTitle: "", expenseAmount: "")
 }

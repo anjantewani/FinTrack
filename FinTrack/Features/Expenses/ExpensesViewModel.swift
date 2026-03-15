@@ -17,18 +17,31 @@ class ExpensesViewModel: ObservableObject {
 //        Expense(id: UUID(), title: "Coffee", amount: 120, date: Date()),
 //        Expense(id: UUID(), title: "Lunch", amount: 220, date: Date())
 //    ]
-    var dummyExpenses: [Expense] = []
-
+    var expenses: [Expense] = []
+    var store: LocalExpensesStore
     @Published var state: ExpensesViewState = .empty
+    
+    init(store: LocalExpensesStore) {
+        self.store = store
+    }
 
     func loadExpenses() {
-        state = dummyExpenses.isEmpty ? .empty : .loaded(dummyExpenses)
+//        state = dummyExpenses.isEmpty ? .empty : .loaded(dummyExpenses)
+        
+        expenses = store.loadExpenses()
+        
+        state = expenses.count == 0 ? .empty : .loaded(expenses)
+        
+        
     }
     
     func addExpenseTapped(withTitle: String, withAmount: String) {
         if let amount = Double(withAmount) {
             let expense = Expense(id: UUID(), title: withTitle, amount: amount, date: .now)
-            dummyExpenses.append(expense)
+            expenses.append(expense)
+            
+            store.saveExpenses(expenses)
+            
             loadExpenses()
         }
     }
@@ -45,7 +58,8 @@ class ExpensesViewModel: ObservableObject {
     
     func deleteExpenses(withIndexes: IndexSet) {
         withIndexes.forEach({ withIndex in
-            dummyExpenses.remove(at: withIndex)
+            expenses.remove(at: withIndex)
+            store.saveExpenses(expenses)
         })
         loadExpenses()
     }
