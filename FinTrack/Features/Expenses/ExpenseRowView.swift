@@ -15,10 +15,15 @@ struct ExpenseRowView: View {
             HStack {
                 Text("\(expense.date.formatted(date: .abbreviated, time: .omitted))")
                     .font(AppTypography.body)
+                    .foregroundStyle(.secondary)
                 
                 Spacer()
             }
             HStack {
+                Image(systemName: expense.category.icon)
+                    .imageScale(.large)
+                    .frame(width: 24)
+                
                 Text("\(expense.title)")
                     .font(AppTypography.title)
                 
@@ -33,6 +38,6 @@ struct ExpenseRowView: View {
 }
 
 #Preview {
-    let expense = Expense(id: UUID(), title: "Coffee", amount: 100.00, date: Date.now)
+    let expense = Expense(id: UUID(), title: "Coffee", amount: 100.00, date: Date.now, category: .food)
     ExpenseRowView(expense: expense)
 }

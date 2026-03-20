@@ -27,6 +27,6 @@ struct ExpenseDetailView: View {
 }
 
 #Preview {
-    let expense = Expense(id: UUID(), title: "Coffee", amount: 100.00, date: Date.now)
+    let expense = Expense(id: UUID(), title: "Coffee", amount: 100.00, date: Date.now, category: .food)
     ExpenseDetailView(expense: expense)
 }
