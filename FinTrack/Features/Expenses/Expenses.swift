@@ -27,7 +27,7 @@ struct Expenses: View {
     
     var body: some View {
         content
-            .onAppear() {
+            .task {
                 expensesViewModel.loadExpenses()
             }
             .navigationTitle("Expenses")
@@ -42,7 +42,7 @@ struct Expenses: View {
             }
             .sheet(isPresented: $showAddExpense) {
                 NavigationStack {
-                    AddExpenseView(expensesViewModel: expensesViewModel, expenseTitle: "", expenseAmount: "")
+                    AddExpenseView(expensesViewModel: expensesViewModel)
                         .navigationTitle("Add Expense")
                 }
             }
@@ -51,6 +51,11 @@ struct Expenses: View {
     @ViewBuilder
     var content: some View {
         switch expensesViewModel.state {
+        case .loading:
+            ProgressView()
+                .progressViewStyle(.circular)
+                .scaleEffect(2)
+            
         case .empty:
             EmptyStateView(title: "No Expenses", description: "You have no expenses yet.", action: {})
             
@@ -66,6 +71,15 @@ struct Expenses: View {
                 .onDelete(perform: { indexes in
                     expensesViewModel.deleteExpenses(withIndexes: indexes)
                 })
+            }
+            
+        case .error:
+            EmptyStateView() {
+                Button {
+                    expensesViewModel.loadExpenses()
+                } label: {
+                    Text("Retry")
+                }
             }
         }
     }

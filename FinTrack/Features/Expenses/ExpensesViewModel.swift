@@ -8,42 +8,39 @@
 import Foundation
 
 enum ExpensesViewState {
+    case loading
     case empty
     case loaded([Expense])
+    case error
 }
 
-class ExpensesViewModel: ObservableObject {
-//    var dummyExpenses: [Expense] = [
-//        Expense(id: UUID(), title: "Coffee", amount: 120, date: Date()),
-//        Expense(id: UUID(), title: "Lunch", amount: 220, date: Date())
-//    ]
-    var expenses: [Expense] = []
+@MainActor class ExpensesViewModel: ObservableObject {
     var store: LocalExpensesStore
     @Published var state: ExpensesViewState = .empty
     
     init(store: LocalExpensesStore) {
         self.store = store
     }
-
+    
     func loadExpenses() {
-//        state = dummyExpenses.isEmpty ? .empty : .loaded(dummyExpenses)
-        
-        expenses = store.loadExpenses()
-        
-        state = expenses.count == 0 ? .empty : .loaded(expenses)
-        
-        
+        state = .loading
+        Task {
+            try await Task.sleep(for: .seconds(3))
+            let expenses = self.store.loadExpenses()
+            self.state = expenses.isEmpty ? .empty : .loaded(expenses)
+        }
     }
     
-    func addExpenseTapped(withTitle: String, withAmount: String) {
-        if let amount = Double(withAmount) {
-            let expense = Expense(id: UUID(), title: withTitle, amount: amount, date: .now)
-            expenses.append(expense)
-            
-            store.saveExpenses(expenses)
-            
-            loadExpenses()
+    func addExpenseTapped(withTitle: String, withAmount: String, withCategory: ExpenseCategory) {
+        guard let amount = Double(withAmount) else { return }
+        var currentExpenses: [Expense] = []
+        if case(.loaded(let expenses)) = state {
+            currentExpenses = expenses
         }
+        let expense = Expense(id: UUID(), title: withTitle, amount: amount, date: .now, category: withCategory)
+        currentExpenses.append(expense)
+        store.saveExpenses(currentExpenses)
+        state = .loaded(currentExpenses)
     }
     
     func checkAddButtonEnability(withTitle: String, withAmount: String) -> Bool {
@@ -57,10 +54,11 @@ class ExpensesViewModel: ObservableObject {
     }
     
     func deleteExpenses(withIndexes: IndexSet) {
-        withIndexes.forEach({ withIndex in
-            expenses.remove(at: withIndex)
-            store.saveExpenses(expenses)
-        })
-        loadExpenses()
+        var currentExpenses: [Expense] = []
+        guard case(.loaded(let expenses)) = state else { return }
+        currentExpenses = expenses
+        currentExpenses.remove(atOffsets: withIndexes)
+        store.saveExpenses(currentExpenses)
+        state = currentExpenses.isEmpty ? .empty : .loaded(currentExpenses)
     }
 }

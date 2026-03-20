@@ -12,4 +12,5 @@ struct Expense: Identifiable, Codable {
     var title: String
     var amount: Double
     var date: Date
+    var category: ExpenseCategory
 }
