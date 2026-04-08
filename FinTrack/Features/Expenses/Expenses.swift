@@ -8,29 +8,25 @@
 import SwiftUI
 
 struct Expenses: View {
-    @StateObject private var expensesViewModel: ExpensesViewModel
+    @StateObject var expensesViewModel: ExpensesViewModel
     @State var showAddExpense: Bool = false
     
-//    MARK: Initializing the View as the @StateObject has dependencies in initialization and cannot directly reference those properties to initalize the @StateObject (that is view model)
-    init() {
-        let directoryUrl = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first!
-        
-        let fileUrl = directoryUrl.appending(component: "expenses.json")
-        
-        let store = LocalExpensesStore(fileURL: fileUrl)
-        
-//        MARK: Usually swiftUI automatically creates the wrapper for @StateObject automatically behind the scenes, but when there are dependencies like this we need to manually create the wrapper and put the state object with depencdencies injected inside it and then assign it to _expenseViewModel, which generally gets automatically created if no dependencies.
-        _expensesViewModel = StateObject(
-            wrappedValue: ExpensesViewModel(store: store)
-        )
-    }
+////    MARK: Initializing the View as the @StateObject has dependencies in initialization and cannot directly reference those properties to initalize the @StateObject (that is view model)
+//    init() {
+//        let directoryUrl = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first!
+//        
+//        let fileUrl = directoryUrl.appending(component: "expenses.json")
+//        
+//        let store = LocalExpensesStore(fileURL: fileUrl)
+//        
+////        MARK: Usually swiftUI automatically creates the wrapper for @StateObject automatically behind the scenes, but when there are dependencies like this we need to manually create the wrapper and put the state object with depencdencies injected inside it and then assign it to _expenseViewModel, which generally gets automatically created if no dependencies.
+//        _expensesViewModel = StateObject(
+//            wrappedValue: ExpensesViewModel(store: store)
+//        )
+//    }
     
     var body: some View {
         content
-            .task {
-                expensesViewModel.loadExpenses()
-            }
-            .navigationTitle("Expenses")
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
                     Button {
@@ -59,9 +55,9 @@ struct Expenses: View {
         case .empty:
             EmptyStateView(title: "No Expenses", description: "You have no expenses yet.", action: {})
             
-        case .loaded(let expenses):
+        case .loaded:
             List {
-                ForEach(expenses) { expense in
+                ForEach(expensesViewModel.expenses) { expense in
                     NavigationLink {
                         ExpenseDetailView(expense: expense)
                     } label: {
@@ -85,6 +81,6 @@ struct Expenses: View {
     }
 }
 
-#Preview {
-    Expenses()
-}
+//#Preview {
+//    Expenses()
+//}

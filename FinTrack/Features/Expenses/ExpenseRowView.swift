@@ -25,12 +25,12 @@ struct ExpenseRowView: View {
                     .frame(width: 24)
                 
                 Text("\(expense.title)")
-                    .font(AppTypography.title)
+                    .font(AppTypography.subtitle)
                 
                 Spacer()
                 
                 Text("₹ \(expense.amount, specifier: "%.2f")")
-                    .font(AppTypography.title)
+                    .font(AppTypography.subtitle)
             }
         }
         .padding(AppSpacing.md)
