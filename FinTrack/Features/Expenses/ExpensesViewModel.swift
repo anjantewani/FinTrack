@@ -22,6 +22,28 @@ enum ExpensesViewState {
         store.expenses
     }
     @Published var state: ExpensesViewState = .empty
+    @Published var selectedCategory: ExpenseCategory? = nil
+    @Published var selectedSortOption: SortOption = .dateLatest
+    
+    var filteredExpenses: [Expense] {
+        guard let category = selectedCategory else {
+            return expenses
+        }
+        return expenses.filter({ $0.category == category })
+    }
+    
+    var sortedExpenses: [Expense] {
+        switch selectedSortOption {
+        case .amountHighToLow:
+            return filteredExpenses.sorted(by: {$0.amount > $1.amount})
+        case .amountLowToHigh:
+            return filteredExpenses.sorted(by: {$0.amount < $1.amount})
+        case .dateLatest:
+            return filteredExpenses.sorted(by: {$0.date > $1.date})
+        case .dateOldest:
+            return filteredExpenses.sorted(by: {$0.date < $1.date})
+        }
+    }
     
     init(store: ExpenseStore) {
         self.store = store

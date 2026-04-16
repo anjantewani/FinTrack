@@ -79,6 +79,27 @@ struct Dashboard: View {
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .padding(.top, AppSpacing.lg)
 
+
+                VStack(alignment: .leading) {
+                    Text("Category Charts")
+                        .font(AppTypography.body)
+                        .foregroundStyle(.secondary)
+                    
+                    if dashboardViewModel.categoryChartData.isEmpty {
+                        Text("No Category data")
+                            .font(AppTypography.body)
+                            .padding(.horizontal, AppSpacing.md)
+                            .padding(.top, AppSpacing.sm)
+                    } else {
+                        VStack(alignment: .leading, spacing: AppSpacing.sm) {
+                            ForEach(dashboardViewModel.categoryChartData, id: \.self) { categorChartData in
+                                BarChartRowView(icon: categorChartData.category.icon, category: categorChartData.category.title, amount: categorChartData.amount, percentage: categorChartData.percentage)
+                            }
+                        }
+                    }
+                }
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .padding(.top, AppSpacing.lg)
                 
                 Spacer()
             }
