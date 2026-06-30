@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct ContentView: View {
-    
+    @EnvironmentObject private var subscriptionStore: SubscriptionStore
     @StateObject private var expenseStore: ExpenseStore
     
 //    MARK: Initializing the ContentView as the @StateObject has dependencies in initialization and cannot directly reference those properties to initalize the @StateObject (that is expenseStore)
@@ -48,7 +48,7 @@ struct ContentView: View {
             }
             
             NavigationStack {
-                Subscriptions()
+                Subscriptions(subscriptionsViewModel: SubscriptionsViewModel(store: subscriptionStore))
                     .navigationTitle("Subscriptions")
             }
             .tabItem() {
@@ -67,6 +67,7 @@ struct ContentView: View {
      
         .task {
             expenseStore.loadExpenses()
+            subscriptionStore.loadSubscriptions()
         }
     }
 }
