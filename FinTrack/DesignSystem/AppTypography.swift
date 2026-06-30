@@ -11,5 +11,6 @@ import SwiftUI
 enum AppTypography {
     static let title = Font.title
     static let subtitle = Font.title2
+    static let secondary = Font.subheadline
     static let body = Font.body
 }

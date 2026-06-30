@@ -78,6 +78,7 @@ enum ExpensesViewState {
     }
     
     func deleteExpenses(withIndexes: IndexSet) {
+//        MARK: (Bug) The list is displaying SortedExpenses, and the deletion is happening on expenses array, so the indexset is mismatching and resulting in incorrect deletion of list item.
         store.deleteExpense(withIndexes)
     }
 }
