@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct Dashboard: View {
-    @StateObject var dashboardViewModel: DashboardViewModel
+    @ObservedObject var dashboardViewModel: DashboardViewModel
     
     var body: some View {
         ScrollView {
