@@ -9,24 +9,7 @@ import SwiftUI
 
 struct ContentView: View {
     @EnvironmentObject private var subscriptionStore: SubscriptionStore
-    @StateObject private var expenseStore: ExpenseStore
-    
-//    MARK: Initializing the ContentView as the @StateObject has dependencies in initialization and cannot directly reference those properties to initalize the @StateObject (that is expenseStore)
-
-    init() {
-        let documentURL = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first!
-        
-        let fileURL = documentURL.appending(component: "expenses.json")
-        
-        let persistence = LocalExpensesStore(fileURL: fileURL)
-
-
-//        MARK: Usually swiftUI automatically creates the wrapper for @StateObject automatically behind the scenes, but when there are dependencies like this we need to manually create the wrapper and put the state object with depencdencies injected inside it and then assign it to _expenseStore, which generally gets automatically created if no dependencies.
-        _expenseStore = StateObject(
-            wrappedValue: ExpenseStore(persistence: persistence)
-        )
-    }
-    
+    @EnvironmentObject private var expenseStore: ExpenseStore
     
     var body: some View {
         
