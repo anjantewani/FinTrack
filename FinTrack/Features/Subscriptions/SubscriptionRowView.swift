@@ -17,7 +17,7 @@ struct SubscriptionRowView: View {
                     Text("\(subscription.name)")
                         .font(AppTypography.subtitle)
                                         
-                    Text("Renews on \(FormattingHelpers.shared.dateFormatter(for: subscription.nextBillingDate, with: "MMM d"))")
+                    Text("Renews on \(FormattingHelpers.shared.dateFormatter(for: subscription.nextBillingDate, with: "MMM d, yyyy"))")
                         .font(AppTypography.secondary)
                         .foregroundStyle(.secondary)
                 }

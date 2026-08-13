@@ -22,6 +22,14 @@ import SwiftUI
         subscriptionStore.subscriptions
     }
     
+    var upcomingRenewals: [Subscription] {
+        let upcomingRenewals = subscriptions.filter( {$0.nextBillingDate > .now }).sorted(by: { $0.nextBillingDate < $1.nextBillingDate })
+        if upcomingRenewals.count > 3 {
+            return Array(upcomingRenewals[...2])
+        }
+        return upcomingRenewals
+    }
+    
     var monthlySubsTotalAmount: Double {
         let monthlySubs = subscriptions.filter({ $0.billingCycle == .monthly } )
         return monthlySubs.reduce(0, { $0 + $1.amount })
