@@ -7,7 +7,8 @@
 
 import Foundation
 
-struct CategoryChartData: Codable, Hashable {
+struct CategoryChartData: Identifiable, Codable, Hashable {
+    let id: UUID
     let category: ExpenseCategory
     let amount: Double
     let percentage: Double

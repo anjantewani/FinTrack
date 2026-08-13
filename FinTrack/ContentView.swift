@@ -15,7 +15,7 @@ struct ContentView: View {
         
         TabView {
             NavigationStack {
-                Dashboard(dashboardViewModel: DashboardViewModel(store: expenseStore))
+                Dashboard(dashboardViewModel: DashboardViewModel(expenseStore: expenseStore, subscriptionStore: subscriptionStore))
                     .navigationTitle("Dashboard")
             }
             .tabItem() {

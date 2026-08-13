@@ -13,4 +13,5 @@ enum AppTypography {
     static let subtitle = Font.title2
     static let secondary = Font.subheadline
     static let body = Font.body
+    static let caption = Font.caption
 }

@@ -11,12 +11,74 @@ import SwiftUI
 
 @MainActor class DashboardViewModel: ObservableObject {
     private var cancellables = Set<AnyCancellable>()
-    private let store: ExpenseStore
+    private let expenseStore: ExpenseStore
+    private let subscriptionStore: SubscriptionStore
+    
     var expenses: [Expense] {
-        store.expenses
+        expenseStore.expenses
     }
+    
+    var subscriptions: [Subscription] {
+        subscriptionStore.subscriptions
+    }
+    
+    var upcomingRenewals: [Subscription] {
+        let upcomingRenewals = subscriptions.filter( {$0.nextBillingDate > .now }).sorted(by: { $0.nextBillingDate < $1.nextBillingDate })
+        if upcomingRenewals.count > 3 {
+            return Array(upcomingRenewals[...2])
+        }
+        return upcomingRenewals
+    }
+    
+    var monthlySubsTotalAmount: Double {
+        let monthlySubs = subscriptions.filter({ $0.billingCycle == .monthly } )
+        return monthlySubs.reduce(0, { $0 + $1.amount })
+    }
+    
+    var activeMonthlySubs: Int {
+        let monthlySubs = subscriptions.filter({ $0.billingCycle == .monthly })
+        let activeSubs = monthlySubs.filter({ $0.nextBillingDate > Date.now })
+        return activeSubs.count
+    }
+    
+    var yearlySubsTotalAmount: Double {
+        let monthlySubs = subscriptions.filter({ $0.billingCycle == .yearly } )
+        return monthlySubs.reduce(0, { $0 + $1.amount })
+    }
+    
+    var activeYearlySubs: Int {
+        let monthlySubs = subscriptions.filter({ $0.billingCycle == .yearly })
+        let activeSubs = monthlySubs.filter({ $0.nextBillingDate > Date.now })
+        return activeSubs.count
+    }
+    
     var totalAmount: Double {
-        return store.expenses.reduce(0) { $0 + $1.amount }
+        return expenseStore.expenses.reduce(0) { $0 + $1.amount }
+    }
+    
+    var expensePercentAgaintPreviousMonth: Double {
+        return Utilities.shared.expensePercentAgainstPreviousMonth(expenses: expenses)
+    }
+    
+    var insightPercentText: String {
+        let percent: String = String(format: "%.0f", abs(expensePercentAgaintPreviousMonth))
+        return "\(percent)% \(expensePercentAgaintPreviousMonth >= 0 ? "more" : "less")"
+    }
+    
+    var insightGuidanceText: String {
+        return expensePercentAgaintPreviousMonth >= 0 ? "Keep an eye on your spending!" : "You're managing your spending well!"
+    }
+    
+    var insightPercentColor: Color {
+        return expensePercentAgaintPreviousMonth >= 0 ? Color.red : Color.green
+    }
+    
+    var previousMonthTotalExpense: Double {
+        return Utilities.shared.previousMonthTotalExpense(expenses: expenses)
+    }
+    
+    var currentMonthTotalExpense: Double {
+        return Utilities.shared.currentMonthTotalExpense(expenses: expenses)
     }
     
     var maxAmount: Double = 0
@@ -25,10 +87,11 @@ import SwiftUI
     @Published var categoryTotals: [ExpenseCategory: Double] = [:]
     @Published var categoryChartData: [CategoryChartData] = []
     
-    init(store: ExpenseStore) {
-        self.store = store
+    init(expenseStore: ExpenseStore, subscriptionStore: SubscriptionStore) {
+        self.expenseStore = expenseStore
+        self.subscriptionStore = subscriptionStore
         
-        store.$expenses
+        expenseStore.$expenses
             .sink { [weak self] expenses in
                 guard let self else { return }
                 self.recentExpenses = Array(expenses.suffix(3).reversed())
@@ -45,10 +108,15 @@ import SwiftUI
                     return self.categoryChartData = []
                 }
                 
-//                MARK: For percentage calculation, not using `(amount * 100)/maxAmount` because in UI we need (0.1, 0.5, etc) as values for bar width and not (10, 50, etc)
+//                MARK: For percentage calculation, not using `(amount * 100)/totalAmount` because in UI we need (0.1, 0.5, etc) as values for bar width and not (10, 50, etc)
                 self.categoryChartData = sortedCategoryTotalsArray.map { sortedCategoryTotal in
-                    return CategoryChartData(category: sortedCategoryTotal.0, amount: sortedCategoryTotal.1, percentage: (sortedCategoryTotal.1)/self.maxAmount)
+                    return CategoryChartData(id: UUID(), category: sortedCategoryTotal.0, amount: sortedCategoryTotal.1, percentage: (sortedCategoryTotal.1)/self.totalAmount)
                 }
+            }
+            .store(in: &cancellables)
+        
+        subscriptionStore.$subscriptions
+            .sink { [weak self] subscriptions in
             }
             .store(in: &cancellables)
     }
