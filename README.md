@@ -131,6 +131,19 @@ FinTrack
 ```
 ---
 
+## 🔀 Development Workflow
+
+Each feature is developed on its own `feature/<name>` branch, created from `development`:
+
+1. Implement the feature with small, milestone-scoped commits
+2. Push the branch and open a pull request into `development`
+3. Self-review the diff and merge using a merge commit, preserving the feature branch's commit history
+4. Pull the latest `development` and create the next feature branch
+
+`development` serves as the integration branch where features are combined and tested, while `main` is updated periodically with stable project milestones. Documentation changes follow the same workflow and are developed separately, such as the `documentation/v1` branch used for the first project phase.
+
+---
+
 ## 🚀 Getting Started
 
 Clone the repository and open the project in Xcode.
